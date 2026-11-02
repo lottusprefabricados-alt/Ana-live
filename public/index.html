@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ana · Acolhimento</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Tela 1: consentimento -->
+  <main id="tela-consentimento" class="tela" hidden>
+    <section class="cartao">
+      <h1>Olá, eu sou a Ana</h1>
+      <p>Sou uma <strong>inteligência artificial</strong> de acolhimento e apoio emocional. Estou aqui para escutar você, sem julgamentos, a qualquer hora.</p>
+      <ul class="avisos">
+        <li>Não sou psicóloga, não faço diagnóstico e não substituo terapia.</li>
+        <li>Para personalizar o atendimento, guardo um resumo dos padrões que observo nas nossas conversas (como você prefere ser ouvido(a), temas que se repetem, o que ajudou). Não guardo diagnósticos.</li>
+        <li>Você pode ver e apagar seus dados quando quiser.</li>
+        <li id="aviso-psicologo" hidden></li>
+        <li><strong>Em crise ou risco de vida?</strong> Ligue <a href="tel:188">188 (CVV)</a>, <a href="tel:192">192 (SAMU)</a> ou <a href="tel:190">190</a>.</li>
+      </ul>
+      <form id="form-consentimento">
+        <label>Como você gostaria de ser chamado(a)? <span class="opcional">(opcional)</span>
+          <input id="campo-nome" maxlength="60" autocomplete="given-name" />
+        </label>
+        <label class="check">
+          <input type="checkbox" id="campo-aceite" required />
+          Li e concordo que meus dados de conversa sejam tratados para personalizar meu acolhimento, conforme a LGPD.
+        </label>
+        <button type="submit" class="primario">Começar atendimento</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- Tela 2: atendimento -->
+  <main id="tela-atendimento" class="tela" hidden>
+    <section class="palco">
+      <div id="avatar" class="avatar" data-estado="parada">
+        <video id="video-parada" muted loop playsinline preload="auto" src="avatar/parada.mp4"></video>
+        <video id="video-falando" muted loop playsinline preload="auto" src="avatar/falando.mp4"></video>
+        <div class="avatar-placeholder" aria-hidden="true"><span>Ana</span></div>
+      </div>
+      <p id="legenda" class="legenda" aria-live="polite"></p>
+    </section>
+
+    <section class="conversa">
+      <div id="alerta-risco" class="alerta-risco" role="alert" hidden>
+        <strong>Você não está sozinho(a).</strong> Se estiver pensando em se machucar, fale agora com alguém:
+        <span id="contatos-risco"></span>
+      </div>
+      <ol id="historico" class="historico" aria-live="polite"></ol>
+      <form id="form-mensagem" class="entrada">
+        <button type="button" id="botao-mic" class="mic" aria-pressed="false" title="Falar">🎤</button>
+        <input id="campo-mensagem" placeholder="Escreva ou toque no microfone para falar…" autocomplete="off" />
+        <button type="submit" class="primario">Enviar</button>
+      </form>
+      <div class="acoes">
+        <label class="check pequeno"><input type="checkbox" id="opcao-voz" checked /> Ana fala em voz alta</label>
+        <button type="button" id="botao-nova-sessao" class="link">Encerrar sessão</button>
+        <button type="button" id="botao-meus-dados" class="link">Meus dados</button>
+        <button type="button" id="botao-excluir" class="link perigo">Apagar meus dados</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="dialogo-dados">
+    <h2>O que a Ana registrou sobre você</h2>
+    <pre id="conteudo-dados"></pre>
+    <form method="dialog"><button class="primario">Fechar</button></form>
+  </dialog>
+
+  <footer class="rodape">Em crise? <a href="tel:188">CVV 188</a> · <a href="tel:192">SAMU 192</a> · Ana é uma IA e não substitui atendimento profissional.</footer>
+
+  <script src="avatar.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
