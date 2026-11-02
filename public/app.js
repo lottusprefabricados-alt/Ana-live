@@ -110,7 +110,10 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ texto, inicio }),
       });
-      if (!r.ok || !r.body) throw new Error("falha");
+      if (!r.ok || !r.body) {
+        const erro = await r.json().catch(() => null);
+        throw new Error(erro?.erro || "falha");
+      }
       const leitor = r.body.pipeThrough(new TextDecoderStream()).getReader();
       let buffer = "";
       for (;;) {
@@ -145,10 +148,13 @@
         }
       }
       if (pendente.trim()) falar(pendente.trim());
-    } catch {
+    } catch (e) {
       balao.classList.remove("digitando");
       balao.classList.add("erro");
-      balao.textContent = "Perdi a conexão por um instante. Pode tentar de novo?";
+      balao.textContent =
+        e.message && e.message !== "falha" && !e.message.startsWith("Failed")
+          ? e.message
+          : "Perdi a conexão por um instante. Pode tentar de novo?";
     } finally {
       ocupado = false;
     }

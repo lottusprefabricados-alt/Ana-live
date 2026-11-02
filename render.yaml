@@ -1,0 +1,28 @@
+# Configuração de deploy no Render (https://render.com) — "Blueprint".
+# No painel do Render: New + → Blueprint → escolha o repositório Ana-live.
+# Ele vai pedir o valor de ANTHROPIC_API_KEY (e, se quiser, PSICOLOGO_RESPONSAVEL).
+services:
+  - type: web
+    name: ana-live
+    runtime: node
+    plan: starter # necessário para o disco persistente; os perfis ficam salvos entre reinícios
+    region: virginia
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/config
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ANTHROPIC_API_KEY
+        sync: false # você digita o valor no painel; nunca vai para o GitHub
+      - key: PSICOLOGO_RESPONSAVEL
+        sync: false
+      - key: DATA_DIR
+        value: /var/data
+      - key: LIMITE_MENSAGENS
+        value: "40"
+    disk:
+      name: ana-dados
+      mountPath: /var/data
+      sizeGB: 1

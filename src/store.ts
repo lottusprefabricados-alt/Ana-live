@@ -7,8 +7,10 @@ import { randomUUID } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import type { PerfilAtendimento } from "./profile.js";
 
-const DATA_DIR = path.resolve("data", "clientes");
-const ALERTS_FILE = path.resolve("data", "alertas.log");
+import { DATA_ROOT } from "./config.js";
+
+const DATA_DIR = path.join(DATA_ROOT, "clientes");
+const ALERTS_FILE = path.join(DATA_ROOT, "alertas.log");
 
 export interface Cliente {
   id: string;

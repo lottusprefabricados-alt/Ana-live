@@ -13,10 +13,19 @@ import {
   salvarCliente,
   type Cliente,
 } from "./store.js";
-import { ATUALIZAR_PERFIL_A_CADA, MODEL, PORT, PSICOLOGO_RESPONSAVEL, VERSAO_TERMO } from "./config.js";
+import {
+  ATUALIZAR_PERFIL_A_CADA,
+  JANELA_LIMITE_MS,
+  LIMITE_MENSAGENS,
+  MODEL,
+  PORT,
+  PSICOLOGO_RESPONSAVEL,
+  VERSAO_TERMO,
+} from "./config.js";
 
 const anthropic = new Anthropic();
 const app = express();
+app.set("trust proxy", 1); // atrás do proxy da hospedagem, para obter o IP real
 app.use(express.json({ limit: "32kb" }));
 app.use(express.static(path.resolve("public")));
 
@@ -105,6 +114,24 @@ app.post("/api/clientes/:id/sessao", async (req, res) => {
   res.json({ ok: true });
 });
 
+// Limite simples, em memória, de mensagens por IP.
+const usoPorIp = new Map<string, number[]>();
+function excedeuLimite(ip: string): boolean {
+  const agora = Date.now();
+  const recentes = (usoPorIp.get(ip) ?? []).filter((t) => agora - t < JANELA_LIMITE_MS);
+  if (recentes.length >= LIMITE_MENSAGENS) {
+    usoPorIp.set(ip, recentes);
+    return true;
+  }
+  recentes.push(agora);
+  usoPorIp.set(ip, recentes);
+  return false;
+}
+setInterval(() => {
+  const agora = Date.now();
+  for (const [ip, ts] of usoPorIp) if (ts.every((t) => agora - t >= JANELA_LIMITE_MS)) usoPorIp.delete(ip);
+}, JANELA_LIMITE_MS).unref();
+
 // Envia uma fala e recebe a resposta da Ana em streaming (Server-Sent Events).
 app.post("/api/clientes/:id/mensagens", async (req, res) => {
   const id = String(req.params.id);
@@ -112,6 +139,10 @@ app.post("/api/clientes/:id/mensagens", async (req, res) => {
   const texto = typeof req.body?.texto === "string" ? req.body.texto.trim().slice(0, 4000) : "";
   if (!inicio && !texto) {
     res.status(400).json({ erro: "Mensagem vazia." });
+    return;
+  }
+  if (excedeuLimite(req.ip ?? "desconhecido")) {
+    res.status(429).json({ erro: "Muitas mensagens em pouco tempo. Respire um pouco e tente de novo em alguns minutos." });
     return;
   }
   if (!(await getCliente(req, res))) return;

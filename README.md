@@ -46,6 +46,19 @@ Use **Chrome ou Edge** para conversar por voz. Esses navegadores têm reconhecim
 
 Em produção: `npm run build && npm start`, atrás de HTTPS (o microfone só funciona em HTTPS ou em localhost).
 
+## Publicar na internet (Render)
+
+O arquivo `render.yaml` configura tudo automaticamente. Dá para fazer pelo celular:
+
+1. Crie uma conta em https://render.com (pode entrar com o GitHub).
+2. No painel, toque em **New + → Blueprint** e escolha o repositório **Ana-live**. Se a branch padrão não tiver o código, selecione a branch `claude/code-explanation-cwd9s7`.
+3. Quando o Render pedir, preencha `ANTHROPIC_API_KEY` com sua chave e, se quiser, `PSICOLOGO_RESPONSAVEL`.
+4. Toque em **Apply**. Em alguns minutos, a Ana fica no ar em `https://ana-live.onrender.com` (ou um endereço parecido).
+
+O plano **Starter** (cerca de US$ 7/mês) é necessário para o disco que guarda os perfis. Se usar o plano gratuito (remova as linhas `plan` e `disk` do `render.yaml`), o app funciona, mas os perfis e alertas se perdem a cada reinício.
+
+Para proteger seus créditos da API, cada IP pode enviar no máximo `LIMITE_MENSAGENS` mensagens a cada 10 minutos (padrão: 40).
+
 ## Avatar em vídeo realista
 
 ### Opção 1: vídeos gravados (incluída, sem custo)
